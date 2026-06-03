@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api/odds.js": { "maxDuration": 30 }
+  },
+  "rewrites": [
+    { "source": "/api/odds", "destination": "/api/odds.js" }
+  ]
+}
