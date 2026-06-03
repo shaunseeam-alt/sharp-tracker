@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sharp Tracker — Live Betting Signals</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090b;--surf:#111113;--card:#17171a;
+  --bdr:#27272a;--bdr2:#3f3f46;
+  --g:#22c55e;--a:#f59e0b;--r:#ef4444;--b:#3b82f6;
+  --txt:#e4e4e7;--txt2:#a1a1aa;--mut:#52525b;--wh:#fafafa;
+}
+html,body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;min-height:100vh;font-size:14px}
+
+.bar{position:sticky;top:0;z-index:50;background:rgba(9,9,11,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem;height:52px}
+.bar-l{display:flex;align-items:center;gap:9px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--g);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.bar-title{font-size:14px;font-weight:600;color:var(--wh)}
+.bar-sub{font-size:11px;color:var(--mut);}
+.bar-r{display:flex;align-items:center;gap:12px}
+.clock{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--g);font-weight:500;line-height:1}
+.clock-lbl{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.07em;margin-top:1px}
+.cd{font-size:10px;color:var(--mut);font-family:'JetBrains Mono',monospace}
+
+.statbar{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--bdr);border-bottom:1px solid var(--bdr)}
+.stat{background:var(--surf);padding:.55rem 1rem}
+.stat-l{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px}
+.stat-v{font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:500}
+
+.fbar{display:flex;gap:5px;padding:.5rem 1.25rem;background:var(--surf);border-bottom:1px solid var(--bdr);overflow-x:auto}
+.fl{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.07em;align-self:center;flex-shrink:0;margin-right:2px}
+.fc{border:1px solid var(--bdr);border-radius:20px;padding:3px 12px;font-size:11px;font-weight:500;color:var(--txt2);cursor:pointer;background:transparent;white-space:nowrap;font-family:'Inter',sans-serif;transition:all .12s;flex-shrink:0}
+.fc:hover{border-color:var(--bdr2);color:var(--txt)}
+.fc.on{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:var(--g)}
+.fc.on-a{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:var(--a)}
+.fc.on-r{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:var(--r)}
+
+.ib{font-size:11px;color:var(--txt2);padding:.35rem 1.25rem;background:var(--surf);border-bottom:1px solid var(--bdr);font-family:'JetBrains Mono',monospace}
+.ib.err{color:var(--r)}
+
+.main{padding:.75rem 1.25rem 3rem;max-width:860px;margin:0 auto}
+
+.grp{display:flex;align-items:center;gap:8px;margin:1rem 0 .4rem;font-size:10px;font-weight:500;color:var(--mut);text-transform:uppercase;letter-spacing:.08em}
+.grp-line{flex:1;height:1px;background:var(--bdr)}
+
+.mc{border:1px solid var(--bdr);border-radius:10px;background:var(--card);padding:.85rem 1rem;margin-bottom:.4rem;position:relative;overflow:hidden;animation:up .2s ease both}
+@keyframes up{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.mc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.mc.cw::before{background:var(--g)}.mc.cw{border-color:rgba(34,197,94,.15)}
+.mc.cd::before{background:var(--a)}.mc.cd{border-color:rgba(245,158,11,.15)}
+.mc.cs::before{background:var(--r)}.mc.cs{border-color:rgba(239,68,68,.2)}
+.mc.cx::before{background:var(--b)}
+.mc.cn::before{background:var(--bdr2)}
+
+.mh{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:.6rem}
+.mt{font-size:13px;font-weight:600;color:var(--wh);line-height:1.3}
+.mvs{color:var(--mut);font-weight:400;font-size:12px}
+.mm{font-size:10px;color:var(--txt2);margin-top:2px}
+.bdgs{display:flex;gap:3px;flex-wrap:wrap;flex-shrink:0}
+.bdg{font-size:9px;font-weight:600;padding:2px 7px;border-radius:20px;border:1px solid}
+.bg{color:var(--g);border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.07)}
+.ba{color:var(--a);border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.07)}
+.br{color:var(--r);border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.07)}
+.bb{color:var(--b);border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.07)}
+.bm{color:var(--mut);border-color:var(--bdr)}
+
+.og{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:.6rem}
+.oc{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:.5rem .6rem;text-align:center;position:relative}
+.oc.pw{border-color:var(--g);background:rgba(34,197,94,.07);box-shadow:0 0 0 1px rgba(34,197,94,.08)}
+.oc.pd{border-color:var(--a);background:rgba(245,158,11,.07);box-shadow:0 0 0 1px rgba(245,158,11,.08)}
+.pin{position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:1px 8px;border-radius:0 0 6px 6px;white-space:nowrap}
+.pin.w{background:var(--g);color:#000}.pin.d{background:var(--a);color:#000}
+.ot{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.ov{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:500;color:var(--wh)}
+.om{font-family:'JetBrains Mono',monospace;font-size:10px;margin-top:2px}
+.om.dn{color:var(--g)}.om.up{color:var(--r)}.om.fl{color:var(--mut)}
+.op{font-size:9px;color:var(--mut);margin-top:1px}
+
+.sb{border-radius:8px;padding:.55rem .8rem;margin-bottom:.55rem;border:1px solid}
+.sb.sw{background:rgba(34,197,94,.04);border-color:rgba(34,197,94,.18)}
+.sb.sd{background:rgba(245,158,11,.04);border-color:rgba(245,158,11,.18)}
+.sb.ss{background:rgba(239,68,68,.04);border-color:rgba(239,68,68,.15)}
+.sb.sx{background:rgba(59,130,246,.03);border-color:rgba(59,130,246,.12)}
+.sb.sn{background:var(--surf);border-color:var(--bdr)}
+.sp{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;font-family:'JetBrains Mono',monospace;margin-bottom:3px}
+.sp.g{color:var(--g)}.sp.a{color:var(--a)}.sp.r{color:var(--r)}.sp.b{color:var(--b)}.sp.m{color:var(--mut)}
+.sr{font-size:11.5px;color:var(--txt2);line-height:1.6}
+.scw{display:flex;align-items:center;gap:6px;margin-top:4px}
+.scb{flex:1;height:3px;background:var(--bdr);border-radius:2px;overflow:hidden}
+.scf{height:100%;border-radius:2px}
+
+.bb-box{display:flex;align-items:center;justify-content:space-between;padding:.6rem .85rem;border-radius:8px;border:1px solid;flex-wrap:wrap;gap:6px}
+.bb-box.w{background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.22)}
+.bb-box.d{background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.22)}
+.bbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin-bottom:2px}
+.bbp{font-size:15px;font-weight:600}
+.bbp.g{color:var(--g)}.bbp.a{color:var(--a)}
+.bbo{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:500;color:var(--wh)}
+.bbol{font-size:9px;color:var(--txt2);text-align:right;margin-bottom:1px}
+
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;text-align:center;color:var(--txt2)}
+.empty-i{font-size:2.5rem;margin-bottom:.75rem;opacity:.35}
+.empty-h{font-size:16px;font-weight:500;color:var(--txt);margin-bottom:.35rem}
+.empty-s{font-size:12px;line-height:1.65;max-width:300px}
+
+@media(max-width:600px){
+  .statbar{grid-template-columns:repeat(3,1fr)}
+  .statbar .stat:nth-child(4),.statbar .stat:nth-child(5){display:none}
+  .bar,.fbar,.main,.ib{padding-left:1rem;padding-right:1rem}
+}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="bar-l">
+    <div class="pulse" id="dot"></div>
+    <div>
+      <div class="bar-title">Sharp Tracker</div>
+      <div class="bar-sub">Live dropping odds · bet365 · Sharp money signals</div>
+    </div>
+  </div>
+  <div class="bar-r">
+    <div>
+      <div class="clock" id="clock">--:--:--</div>
+      <div class="clock-lbl">Mauritius UTC+4</div>
+    </div>
+    <div class="cd" id="cd">—</div>
+  </div>
+</div>
+
+<div class="statbar">
+  <div class="stat"><div class="stat-l">Matches</div><div class="stat-v" id="st" style="color:var(--txt)">—</div></div>
+  <div class="stat"><div class="stat-l">Win signals</div><div class="stat-v" id="sw" style="color:var(--g)">—</div></div>
+  <div class="stat"><div class="stat-l">Draw signals</div><div class="stat-v" id="sd" style="color:var(--a)">—</div></div>
+  <div class="stat"><div class="stat-l">Steam moves</div><div class="stat-v" id="ss" style="color:var(--r)">—</div></div>
+  <div class="stat"><div class="stat-l">Skip</div><div class="stat-v" id="sk" style="color:var(--mut)">—</div></div>
+</div>
+
+<div class="fbar">
+  <span class="fl">View</span>
+  <button class="fc on"  onclick="filt('all',this)">All matches</button>
+  <button class="fc"     onclick="filt('signal',this)">Signals only</button>
+  <button class="fc"     onclick="filt('win',this)">Win signals</button>
+  <button class="fc"     onclick="filt('draw',this)">Draw signals</button>
+  <button class="fc"     onclick="filt('steam',this)">Steam moves</button>
+  <button class="fc"     onclick="filt('high',this)">High conf ≥70%</button>
+  <button class="fc"     onclick="filt('skip',this)">Skip (no edge)</button>
+</div>
+
+<div class="ib" id="ib">⏳ Loading live dropping odds from oddslot.com...</div>
+
+<div class="main" id="main"></div>
+
+<script>
+const POLL = 120;
+let allM = [], filter = 'all', cd = POLL, cdT = null;
+
+function pad(n){ return String(n).padStart(2,'0'); }
+function mutStr(){
+  const d = new Date(Date.now()+4*3600000);
+  return pad(d.getUTCHours())+':'+pad(d.getUTCMinutes())+':'+pad(d.getUTCSeconds());
+}
+setInterval(()=>{ const e=document.getElementById('clock'); if(e) e.textContent=mutStr(); },1000);
+
+function startCD(){
+  if(cdT) clearInterval(cdT);
+  cd=POLL;
+  cdT=setInterval(()=>{
+    cd--;
+    const e=document.getElementById('cd');
+    if(e) e.textContent='next '+cd+'s';
+    if(cd<=0){ clearInterval(cdT); fetchOdds(); }
+  },1000);
+}
+
+async function fetchOdds(){
+  setDot('loading'); setIB('⟳ Fetching live odds from oddslot.com...');
+  try {
+    const r = await fetch('/api/odds');
+    const data = await r.json();
+    if(!data.ok) throw new Error(data.error||'API error');
+    allM = data.matches.map(analyse).filter(Boolean);
+    allM.sort((a,b)=>b.conf-a.conf);
+    updateStats(); renderVisible();
+    const t = new Date(Date.now()+4*3600000);
+    setIB('✓ Updated '+pad(t.getUTCHours())+':'+pad(t.getUTCMinutes())+' MUT · '+allM.length+' matches analysed · source: oddslot.com');
+    setDot('live');
+    startCD();
+  } catch(e){
+    setIB('⚠ '+e.message, true);
+    setDot('err');
+    startCD();
+  }
+}
+
+function analyse(m){
+  const hM = pct(m.hP,m.hN);
+  const dM = pct(m.dP,m.dN);
+  const aM = pct(m.aP,m.aN);
+
+  let sig,pick,betOn=null,steam=false,conf=0,pattern,patType,reason;
+
+  if(hM>=7&&dM<0&&aM<0){
+    sig='WIN';pick='Home win';betOn=m.home;steam=true;conf=Math.min(88,70+Math.floor(hM*1.5));
+    pattern='⚡ Steam move — home';patType='r';
+    reason='Home dropped '+hM.toFixed(1)+'% ('+f(m.hP)+'→'+f(m.hN)+') while draw drifted '+Math.abs(dM).toFixed(1)+'% and away drifted '+Math.abs(aM).toFixed(1)+'%. All sharp money on '+m.home+'.';
+  } else if(aM>=7&&hM<0&&dM<0){
+    sig='WIN';pick='Away win';betOn=m.away;steam=true;conf=Math.min(88,70+Math.floor(aM*1.5));
+    pattern='⚡ Steam move — away';patType='r';
+    reason='Away dropped '+aM.toFixed(1)+'% ('+f(m.aP)+'→'+f(m.aN)+') while home drifted '+Math.abs(hM).toFixed(1)+'% and draw drifted '+Math.abs(dM).toFixed(1)+'%. Sharp money on '+m.away+'.';
+  } else if(hM<=-10&&aM>=5){
+    sig='WIN';pick='Away win';betOn=m.away;steam=true;conf=Math.min(84,65+Math.floor(aM));
+    pattern='⚡ Reverse steam';patType='r';
+    reason='Home drifted '+Math.abs(hM).toFixed(1)+'% while away dropped '+aM.toFixed(1)+'%. Public on home, sharps loading away.';
+  } else if(dM>=4&&hM<0&&aM<0){
+    sig='DRAW';pick='Draw';betOn='Draw';conf=Math.min(74,58+Math.floor(dM*2));
+    pattern='Draw compression';patType='a';
+    reason='Draw dropped '+dM.toFixed(1)+'% ('+f(m.dP)+'→'+f(m.dN)+') while home and away both drifted. Sharp money quietly on the draw at '+f(m.dN)+'.';
+  } else if(hM>=3&&hM<7&&aM<=0){
+    sig='WIN';pick='Home win';betOn=m.home;conf=Math.min(65,50+Math.floor(hM*5));
+    pattern='Soft home move';patType='g';
+    reason='Home dropped '+hM.toFixed(1)+'% ('+f(m.hP)+'→'+f(m.hN)+'). Steady money toward '+m.home+'.';
+  } else if(aM>=3&&aM<7&&hM<=0){
+    sig='WIN';pick='Away win';betOn=m.away;conf=Math.min(65,50+Math.floor(aM*5));
+    pattern='Soft away move';patType='g';
+    reason='Away dropped '+aM.toFixed(1)+'% ('+f(m.aP)+'→'+f(m.aN)+'). Steady money toward '+m.away+'.';
+  } else if(Math.abs(hM)<0.3&&Math.abs(dM)<0.3&&Math.abs(aM)<0.3){
+    sig='SKIP';pattern='Flat market';patType='n';conf=0;
+    reason='All odds unchanged. No sharp activity — skip this match.';
+  } else {
+    sig='WATCH';pattern='Mixed movement';patType='x';
+    conf=Math.min(40,10+Math.floor(Math.max(Math.abs(hM),Math.abs(dM),Math.abs(aM))*3));
+    reason='Unclear direction — Home '+(hM>0?'▼':'▲')+Math.abs(hM).toFixed(1)+'% · Draw '+(dM>0?'▼':'▲')+Math.abs(dM).toFixed(1)+'% · Away '+(aM>0?'▼':'▲')+Math.abs(aM).toFixed(1)+'%.';
+  }
+
+  return {...m,hM,dM,aM,sig,pick,betOn,steam,conf,pattern,patType,reason};
+}
+
+function filt(f,btn){
+  filter=f;
+  document.querySelectorAll('.fc').forEach(b=>b.className='fc');
+  btn.classList.add(f==='draw'?'on-a':f==='steam'?'on-r':'on');
+  renderVisible();
+}
+
+function renderVisible(){
+  let vis=allM;
+  if(filter==='signal') vis=allM.filter(m=>m.sig==='WIN'||m.sig==='DRAW');
+  else if(filter==='win') vis=allM.filter(m=>m.sig==='WIN');
+  else if(filter==='draw') vis=allM.filter(m=>m.sig==='DRAW');
+  else if(filter==='steam') vis=allM.filter(m=>m.steam);
+  else if(filter==='high') vis=allM.filter(m=>m.conf>=70);
+  else if(filter==='skip') vis=allM.filter(m=>m.sig==='SKIP');
+  renderList(vis);
+}
+
+function renderList(matches){
+  const wrap=document.getElementById('main');
+  if(!matches.length){
+    wrap.innerHTML='<div class="empty"><div class="empty-i">📭</div><div class="empty-h">No matches</div><div class="empty-s">No matches for this filter right now.</div></div>';
+    return;
+  }
+
+  // Group: signals first, then watch, then skip
+  const top=matches.filter(m=>m.sig==='WIN'||m.sig==='DRAW');
+  const watch=matches.filter(m=>m.sig==='WATCH');
+  const skip=matches.filter(m=>m.sig==='SKIP');
+
+  let html='';
+  if(top.length) html+=grpHdr('🔥 Signals — sharp money detected · '+top.length+' match'+(top.length>1?'es':''))+top.map((m,i)=>mkCard(m,i)).join('');
+  if(watch.length) html+=grpHdr('👁 Monitor — movement developing · '+watch.length)+watch.map((m,i)=>mkCard(m,i+top.length)).join('');
+  if(skip.length) html+=grpHdr('— No edge · '+skip.length+' matches flat')+skip.map((m,i)=>mkCard(m,i+top.length+watch.length)).join('');
+  wrap.innerHTML=html;
+}
+
+function grpHdr(lbl){
+  return `<div class="grp"><span class="grp-line"></span><span>${esc(lbl)}</span><span class="grp-line"></span></div>`;
+}
+
+function mkCard(m,i){
+  const isW=m.sig==='WIN',isD=m.sig==='DRAW';
+  const isH=m.betOn===m.home,isA=m.betOn===m.away,isDrw=m.betOn==='Draw';
+
+  let cls='mc';
+  if(m.steam) cls+=' cs';
+  else if(isW) cls+=' cw';
+  else if(isD) cls+=' cd';
+  else if(m.sig==='WATCH') cls+=' cx';
+  else cls+=' cn';
+
+  let bdgs='';
+  if(m.steam) bdgs+='<span class="bdg br">⚡ Steam</span>';
+  if(isW&&m.conf>=70) bdgs+='<span class="bdg bg">Win signal</span>';
+  else if(isW) bdgs+='<span class="bdg bg">Win</span>';
+  if(isD&&m.conf>=65) bdgs+='<span class="bdg ba">Draw signal</span>';
+  else if(isD) bdgs+='<span class="bdg ba">Draw</span>';
+  if(m.sig==='WATCH') bdgs+='<span class="bdg bb">Monitor</span>';
+  if(m.sig==='SKIP') bdgs+='<span class="bdg bm">Skip</span>';
+
+  const hM=m.hM,dM=m.dM,aM=m.aM;
+  const hCls='oc'+(isH?' pw':''), dCls='oc'+(isDrw?' pd':''), aCls='oc'+(isA?' pw':'');
+  const oddsHTML=`<div class="og">
+    <div class="${hCls}">
+      ${isH?'<div class="pin w">Bet this</div>':''}
+      <div class="ot" style="margin-top:${isH?'10px':'0'}">Home</div>
+      <div class="ov">${f(m.hN)}</div>
+      <div class="om ${hM>0?'dn':hM<0?'up':'fl'}">${mvS(hM)}</div>
+      <div class="op">open ${f(m.hP)}</div>
+    </div>
+    <div class="${dCls}">
+      ${isDrw?'<div class="pin d">Bet this</div>':''}
+      <div class="ot" style="margin-top:${isDrw?'10px':'0'}">Draw</div>
+      <div class="ov">${f(m.dN)}</div>
+      <div class="om ${dM>0?'dn':dM<0?'up':'fl'}">${mvS(dM)}</div>
+      <div class="op">open ${f(m.dP)}</div>
+    </div>
+    <div class="${aCls}">
+      ${isA?'<div class="pin w">Bet this</div>':''}
+      <div class="ot" style="margin-top:${isA?'10px':'0'}">Away</div>
+      <div class="ov">${f(m.aN)}</div>
+      <div class="om ${aM>0?'dn':aM<0?'up':'fl'}">${mvS(aM)}</div>
+      <div class="op">open ${f(m.aP)}</div>
+    </div>
+  </div>`;
+
+  const sbc='sb s'+m.patType;
+  const cc=m.conf>=70?'var(--g)':m.conf>=50?'var(--a)':'var(--r)';
+  const conf=m.conf>0?`<div class="scw"><div class="scb"><div class="scf" style="width:${m.conf}%;background:${cc}"></div></div><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--txt2)">${m.conf}%</span></div>`:'';
+  const sigHTML=`<div class="${sbc}">
+    <div class="sp ${m.patType}">${esc(m.pattern)}</div>
+    <div class="sr">${esc(m.reason)}</div>
+    ${conf}
+  </div>`;
+
+  let betHTML='';
+  if(isW||isD){
+    const ent=isH?m.hN:isA?m.aN:isDrw?m.dN:0;
+    betHTML=`<div class="bb-box ${isD?'d':'w'}">
+      <div><div class="bbl">📌 Bet selection</div>
+      <div class="bbp ${isD?'a':'g'}">${esc(m.pick)}${m.betOn?' — '+esc(m.betOn):''}</div></div>
+      ${ent?`<div><div class="bbol">Entry odds (bet365)</div><div class="bbo">${f(ent)}</div></div>`:''}
+    </div>`;
+  }
+
+  const timeDisp=m.time?'KO '+m.time+' UTC':'Upcoming';
+  return `<div class="${cls}" style="animation-delay:${i*.025}s">
+    <div class="mh">
+      <div>
+        <div class="mt">${esc(m.home)} <span class="mvs">vs</span> ${esc(m.away)}</div>
+        <div class="mm">${esc(m.league||timeDisp)}</div>
+      </div>
+      <div class="bdgs">${bdgs}</div>
+    </div>
+    ${oddsHTML}
+    ${sigHTML}
+    ${betHTML}
+  </div>`;
+}
+
+function updateStats(){
+  document.getElementById('st').textContent=allM.length||'—';
+  document.getElementById('sw').textContent=allM.filter(m=>m.sig==='WIN').length||'—';
+  document.getElementById('sd').textContent=allM.filter(m=>m.sig==='DRAW').length||'—';
+  document.getElementById('ss').textContent=allM.filter(m=>m.steam).length||'—';
+  document.getElementById('sk').textContent=allM.filter(m=>m.sig==='SKIP').length||'—';
+}
+function setIB(msg,err){ const e=document.getElementById('ib'); e.textContent=msg; e.className='ib'+(err?' err':''); }
+function setDot(s){ const d=document.getElementById('dot'); d.style.background=s==='live'?'var(--g)':s==='loading'?'var(--a)':'var(--r)'; }
+function mvS(p){ if(!p||Math.abs(p)<0.1) return 'flat'; return (p>0?'▼':'▲')+' '+Math.abs(p).toFixed(1)+'%'; }
+function pct(p,n){ return(!p||!n||p===n)?0:((p-n)/p)*100; }
+function f(v){ return v?Number(v).toFixed(2):'—'; }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+fetchOdds();
+</script>
+</body>
+</html>
